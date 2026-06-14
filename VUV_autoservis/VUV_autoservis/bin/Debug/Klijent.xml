@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Klijenti>
+	<Klijent>
+		<IDKlijenta>K001</IDKlijenta>
+		<IDOsoba>O001</IDOsoba>
+		<Ime>Ivan</Ime>
+		<Prezime>Horvat</Prezime>
+		<DatumRodjenja>1990-05-10</DatumRodjenja>
+		<OIB>12345678901</OIB>
+	</Klijent>
+</Klijenti>

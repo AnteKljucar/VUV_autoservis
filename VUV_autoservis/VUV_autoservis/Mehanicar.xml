@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Mehanicari>
+	<Mehanicar>
+		<IDMehanicar>M001</IDMehanicar>
+		<IDOsoba>O002</IDOsoba>
+		<Ime>Marko</Ime>
+		<Prezime>Marić</Prezime>
+		<DatumRodjenja>1985-03-15</DatumRodjenja>
+		<OIB>98765432109</OIB>
+	</Mehanicar>
+</Mehanicari>
