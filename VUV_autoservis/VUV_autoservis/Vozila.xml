@@ -1,9 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
 <Vozila>
-	<Vozilo>
-		<IDVozila>V001</IDVozila>
-		<Registracija>VT123AB</Registracija>
-		<Marka>Volkswagen</Marka>
-		<IDKlijenta>K001</IDKlijenta>
-	</Vozilo>
+  <Vozilo>
+    <ID>V0</ID>
+    <Registracija>VT123AB</Registracija>
+    <Marka>Volkswagen</Marka>
+    <IDKlijenta>K0</IDKlijenta>
+    <Izbrisan>False</Izbrisan>
+  </Vozilo>
 </Vozila>

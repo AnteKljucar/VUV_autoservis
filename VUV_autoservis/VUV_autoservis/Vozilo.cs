@@ -11,14 +11,17 @@ namespace VUV_autoservis
         public string IDVozila { get; private set;}
         public string RegistracijskaOznaka { get; private set; }
         public string Marka { get; private set; }
-        public Klijent Vlasnik { get; private set; }
+        public string IDKlijenta { get; private set; }
 
-        public Vozilo(string idvozila, string registracijskaOznaka, string marka, Klijent vlasnik)
+        public bool Izbrisan { get;  set; }
+
+        public Vozilo(string idvozila, string registracijskaOznaka, string marka, string vlasnik, bool izbrisan)
         {
             IDVozila = idvozila;
             RegistracijskaOznaka = registracijskaOznaka;
             Marka = marka;
-            Vlasnik = vlasnik;
+            IDKlijenta = vlasnik;
+            Izbrisan = izbrisan;
         }
     }
 }

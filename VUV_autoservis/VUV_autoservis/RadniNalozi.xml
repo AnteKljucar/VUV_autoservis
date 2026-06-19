@@ -1,15 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <RadniNalozi>
 	<RadniNalog>
-		<IDNaloga>RN001</IDNaloga> 
-		<IDVozila>V001</IDVozila>
-		<IDMehanicara>M001</IDMehanicara>
+		<IDNaloga>N0</IDNaloga> 
+		<IDVozila>V0</IDVozila>
+		<IDMehanicara>M0</IDMehanicara>
 		<Datum>2025-06-15</Datum>
 		<Status>U_Radu</Status>
 		<UkupnaCijena>150</UkupnaCijena>
-		<Usluge>	
-			<Usluga>Dijagnostika</Usluga>
-			<Usluga>Zamjena ulja</Usluga>
-		</Usluge>
+		<Usluga>Dijagnostika</Usluga>
 	</RadniNalog>
 </RadniNalozi>

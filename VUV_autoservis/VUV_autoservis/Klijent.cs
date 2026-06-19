@@ -8,12 +8,15 @@ namespace VUV_autoservis
 {
     class Klijent : Osoba
     {
-        public string IDKlijenta { get; private set; }
+        public string IDKlijenta { get; set; }
+        public bool izbrisan { get; set; }
 
-        public Klijent(string idKlijenta, string idOsoba, string ime, string prezime, DateTime datumRodjenja, string oib)
-            : base(idOsoba, ime, prezime, datumRodjenja, oib)
+    public Klijent(string idKlijenta, string ime, string prezime, DateTime datumRodjenja, string oib, bool izbis)
+            : base(ime, prezime, datumRodjenja, oib)
         {
             IDKlijenta = idKlijenta;
+            izbrisan = izbis;
+
         }
     }
 }

@@ -9,3 +9,16 @@ C:\Users\Akljucar\source\repos\VUV_autoservis\VUV_autoservis\bin\Debug\Klijent.x
 C:\Users\Akljucar\source\repos\VUV_autoservis\VUV_autoservis\bin\Debug\Mehanicar.xml
 C:\Users\Akljucar\source\repos\VUV_autoservis\VUV_autoservis\bin\Debug\RadniNalozi.xml
 C:\Users\Akljucar\source\repos\VUV_autoservis\VUV_autoservis\bin\Debug\Vozila.xml
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\Klijent.xml
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\Mehanicar.xml
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\RadniNalozi.xml
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\Vozila.xml
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\VUV_autoservis.exe.config
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\VUV_autoservis.exe
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\VUV_autoservis.pdb
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.csproj.AssemblyReference.cache
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.csproj.CoreCompileInputs.cache
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.exe
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.pdb
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\ConsoleTableExt.dll
+C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.csproj.CopyComplete
