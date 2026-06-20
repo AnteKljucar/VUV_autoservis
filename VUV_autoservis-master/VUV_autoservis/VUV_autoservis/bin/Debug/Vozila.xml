@@ -1,0 +1,23 @@
+<Vozila>
+  <Vozilo>
+    <ID>V1</ID>
+    <Registracija>DA12141</Registracija>
+    <Marka>Audi</Marka>
+    <IDKlijenta>K2</IDKlijenta>
+    <Izbrisan>False</Izbrisan>
+  </Vozilo>
+  <Vozilo>
+    <ID>V2</ID>
+    <Registracija>DA12121</Registracija>
+    <Marka>BMW</Marka>
+    <IDKlijenta>K4</IDKlijenta>
+    <Izbrisan>False</Izbrisan>
+  </Vozilo>
+  <Vozilo>
+    <ID>V3</ID>
+    <Registracija>VT124112</Registracija>
+    <Marka>Mazda</Marka>
+    <IDKlijenta>K1</IDKlijenta>
+    <Izbrisan>False</Izbrisan>
+  </Vozilo>
+</Vozila>

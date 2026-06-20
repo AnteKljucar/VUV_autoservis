@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Logovi>
+	<Log>
+		<IDNaloga>RN001</IDNaloga>
+		<Registracija>VT123AB</Registracija>
+		<Status>Zaprimljen</Status>
+		<Datum>2025-06-15 09:00</Datum>
+	</Log>
+
+	<Log>
+		<IDNaloga>RN001</IDNaloga>
+		<Registracija>VT123AB</Registracija>
+		<Status>U_Radu</Status>
+		<Datum>2025-06-15 10:30</Datum>
+	</Log>
+</Logovi>

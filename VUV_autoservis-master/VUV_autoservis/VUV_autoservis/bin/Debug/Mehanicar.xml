@@ -1,0 +1,26 @@
+<Mehanicari>
+  <Mehanicar>
+    <IDMehanicar>M1</IDMehanicar>
+    <Ime>Igor</Ime>
+    <Prezime>Belan</Prezime>
+    <DatumRodjenja>2005-12-12</DatumRodjenja>
+    <OIB>12312312321</OIB>
+    <Izbrisan>False</Izbrisan>
+  </Mehanicar>
+  <Mehanicar>
+    <IDMehanicar>M2</IDMehanicar>
+    <Ime>Marko</Ime>
+    <Prezime>Kljucar</Prezime>
+    <DatumRodjenja>1999-05-27</DatumRodjenja>
+    <OIB>12345678910</OIB>
+    <Izbrisan>False</Izbrisan>
+  </Mehanicar>
+  <Mehanicar>
+    <IDMehanicar>M3</IDMehanicar>
+    <Ime>Josip</Ime>
+    <Prezime>Kljucar</Prezime>
+    <DatumRodjenja>2000-03-01</DatumRodjenja>
+    <OIB>12345678910</OIB>
+    <Izbrisan>False</Izbrisan>
+  </Mehanicar>
+</Mehanicari>

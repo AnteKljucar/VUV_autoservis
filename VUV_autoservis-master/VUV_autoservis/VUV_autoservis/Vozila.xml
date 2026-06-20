@@ -1,0 +1,9 @@
+<Vozila>
+  <Vozilo>
+    <ID>V0</ID>
+    <Registracija>VT123AB</Registracija>
+    <Marka>Volkswagen</Marka>
+    <IDKlijenta>K0</IDKlijenta>
+    <Izbrisan>False</Izbrisan>
+  </Vozilo>
+</Vozila>
