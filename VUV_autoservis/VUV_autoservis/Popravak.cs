@@ -11,8 +11,8 @@ namespace VUV_autoservis
         private int brojSati;
         private const int cijenaPoSatu = 30;
 
-        public Popravak(string id, string naziv, int brojSati)
-            : base(id, naziv)
+        public Popravak(string naziv, int brojSati)
+            : base(naziv)
         {
             this.brojSati = brojSati;
         }

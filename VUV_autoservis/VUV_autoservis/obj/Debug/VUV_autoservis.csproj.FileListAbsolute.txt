@@ -22,3 +22,16 @@ C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autos
 C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.pdb
 C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\bin\Debug\ConsoleTableExt.dll
 C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.csproj.CopyComplete
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\Klijent.xml
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\Mehanicar.xml
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\RadniNalozi.xml
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\VUV_autoservis.exe.config
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\VUV_autoservis.exe
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\VUV_autoservis.pdb
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\ConsoleTableExt.dll
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.csproj.AssemblyReference.cache
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.csproj.CoreCompileInputs.cache
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.csproj.CopyComplete
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.exe
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\obj\Debug\VUV_autoservis.pdb
+C:\Users\Akljucar\source\repos\VUV_autoservis-master\VUV_autoservis\VUV_autoservis\bin\Debug\Vozila.xml

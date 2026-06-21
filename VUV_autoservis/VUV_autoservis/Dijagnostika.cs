@@ -10,9 +10,10 @@ namespace VUV_autoservis
     {
         private const int cijena = 50;
 
-        public Dijagnostika(string id, string naziv)
-            : base(id, naziv)
+        public Dijagnostika(string naziv)
+            : base(naziv)
         {
+            
         }
         public override int IzracunajCijenu()
         {

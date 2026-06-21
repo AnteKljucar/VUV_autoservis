@@ -8,12 +8,10 @@ namespace VUV_autoservis
 {
     abstract class Usluga : lObracunljivo
     {
-        public string IDUsluga { get; private set; }
-        public string Naziv { get; private set; }
+        public string Naziv { get; set; }
 
-        public Usluga(string id, string naziv)
+        public Usluga(string naziv)
         {
-            IDUsluga = id;
             Naziv = naziv;
         }
 

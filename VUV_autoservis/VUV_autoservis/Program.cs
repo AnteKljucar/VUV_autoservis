@@ -1,8 +1,9 @@
-﻿using System;
+﻿using ConsoleTableExt;
+using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.IO;
-using ConsoleTableExt;
+using System.Xml;
+using System.Runtime.InteropServices;
 
 
 
@@ -10,10 +11,25 @@ namespace VUV_autoservis
 {
     class Program
     {
-        static string putanjaKlijenti = @"C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\Klijent.xml";
-        static string putanjaVozila = @"C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\Vozila.xml";
-        static string putanjaMehanicar = @"C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\Mehanicar.xml";
-        static string putanjaRadniNalog = @"C:\Users\AK\OneDrive\Dokumenti\VUV_autoservis\VUV_autoservis\RadniNalog.xml";
+        static string basePath = Directory.GetCurrentDirectory();
+
+        static string putanjaKlijenti = Path.Combine(basePath, "Klijent.xml");
+        static string putanjaVozila = Path.Combine(basePath, "Vozila.xml");
+        static string putanjaMehanicar = Path.Combine(basePath, "Mehanicar.xml");
+        static string putanjaRadniNalog = Path.Combine(basePath, "RadniNalozi.xml");
+
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        const int SW_MAXIMIZE = 3;
+
+
+
+
 
         static List<Klijent> klijenti = new List<Klijent>();
         static List<Mehanicar> mehanicari = new List<Mehanicar>();
@@ -25,40 +41,122 @@ namespace VUV_autoservis
 
         //Dodavanje Klijenta
 
-        public static List<Klijent> dodavanjeKlijenata(List<Klijent> lKlijenta)
+        public static List<Klijent> dodavanjeKlijenata(List<Klijent> lKlijenta, List<Mehanicar> lMehanicara)
         {
             Console.Clear();
             Console.WriteLine("===== UNOS NOVOG KLIJENTA =====\n");
 
             string id = Convert.ToString("K" + (lKlijenta.Count + 1));
             bool izbris = false;
+            string prezime = null;
+            string ime = null;
 
-            Console.Write("Ime: ");
-            string ime = Console.ReadLine();
 
-            Console.Write("Prezime: ");
-            string prezime = Console.ReadLine();
+            bool unosImena = true;
+            while (unosImena) {
+                Console.Write("Ime: ");
+                ime = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(ime))
+                {
+                    Console.WriteLine("Pogrešan unos.");
+
+                }
+                else
+                {
+                    unosImena = false;
+                }
+            }
+
+            bool unosPrezimena = true;
+            while (unosPrezimena)
+            {
+                Console.Write("Prezime: ");
+                prezime = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(prezime))
+                {
+                    Console.WriteLine("Pogrešan unos.");
+                }
+                else
+                {
+                    unosPrezimena = false;
+                }
+
+            }
+
 
             DateTime datumRodjenja;
+
             while (true)
             {
                 Console.Write("Datum rođenja (yyyy-MM-dd): ");
-                if (DateTime.TryParse(Console.ReadLine(), out datumRodjenja))
-                    break;
 
-                Console.WriteLine("Neispravan format datuma!");
+                if (!DateTime.TryParse(Console.ReadLine(), out datumRodjenja))
+                {
+                    Console.WriteLine("Neispravan format datuma!");
+                    continue;
+                }
+
+                if (datumRodjenja.Date > DateTime.Today)
+                {
+                    Console.WriteLine("Datum rođenja ne može biti u budućnosti!");
+                    continue;
+                }
+
+                break;
             }
 
             string oib;
+
             while (true)
             {
                 Console.Write("OIB: ");
                 oib = Console.ReadLine();
 
-                if (oib.Length == 11)
-                    break;
+                long provjereniOIB;
 
-                Console.WriteLine("OIB mora imati 11 znamenki!");
+                if (!long.TryParse(oib, out provjereniOIB))
+                {
+                    Console.WriteLine("OIB mora sadržavati samo brojeve.");
+                    continue;
+                }
+
+                if (oib.Length != 11)
+                {
+                    Console.WriteLine("OIB mora imati točno 11 znamenki.");
+                    continue;
+                }
+
+                bool postoji = false;
+
+                foreach (Klijent k in lKlijenta)
+                {
+                    if (k.OIB == oib)
+                    {
+                        postoji = true;
+                        break;
+                    }
+                }
+
+                if (!postoji)
+                {
+                    foreach (Mehanicar m in lMehanicara)
+                    {
+                        if (m.OIB == oib)
+                        {
+                            postoji = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (postoji)
+                {
+                    Console.WriteLine("Osoba s tim OIB-om već postoji.");
+                    continue;
+                }
+
+                break;
             }
 
             Klijent novi = new Klijent(
@@ -86,7 +184,7 @@ namespace VUV_autoservis
 
         public static List<Klijent> azuriranjeKlijenata(List<Klijent> lKlijenta)
         {
-            ponovniOdabirKorisnika:
+        ponovniOdabirKorisnika:
             Console.Clear();
             var tableDataKlijent = new List<List<object>>();
             var tableDataKlijentZaAzuriranje = new List<List<object>>();
@@ -138,10 +236,6 @@ namespace VUV_autoservis
         .ExportAndWriteLine();
 
 
-
-
-
-
                 bool izbornikZaAzuriranjeKorisnika = true;
                 while (izbornikZaAzuriranjeKorisnika)
                 {
@@ -149,9 +243,8 @@ namespace VUV_autoservis
                     Console.WriteLine("--- 1. Ime");
                     Console.WriteLine("--- 2. Prezime");
                     Console.WriteLine("--- 3. Datum rođenja");
-                    Console.WriteLine("--- 4. OIB");
-                    Console.WriteLine("--- 5. Izbrisan");
-                    Console.WriteLine("--- 6. Povratak");
+                    Console.WriteLine("--- 4. Izbrisan");
+                    Console.WriteLine("--- 5. Povratak");
                     odabir = Console.ReadLine();
                     int odabirProvjereno = 0;
                     if (!int.TryParse(odabir, out odabirProvjereno))
@@ -162,31 +255,84 @@ namespace VUV_autoservis
                     switch (odabirProvjereno)
                     {
                         case 1:
-                            Console.Write("Unesi novo ime: ");
-                            zaAzuriranje.Ime = Console.ReadLine();
+                            bool unosImena = true;
+                            while (unosImena)
+                            {
+                                Console.Write("Ime: ");
+                                zaAzuriranje.Ime = Console.ReadLine();
+                                if (string.IsNullOrWhiteSpace(zaAzuriranje.Ime))
+                                {
+                                    Console.WriteLine("Pogrešan unos.");
+
+                                }
+                                else
+                                {
+                                    unosImena = false;
+                                }
+                            }
                             break;
 
                         case 2:
-                            Console.Write("Unesi novo prezime: ");
-                            zaAzuriranje.Prezime = Console.ReadLine();
+                            bool unosPrezimena = true;
+
+                            while (unosPrezimena)
+                            {
+                                Console.Write("Prezime: ");
+                                zaAzuriranje.Prezime = Console.ReadLine();
+
+                                if (string.IsNullOrWhiteSpace(zaAzuriranje.Prezime))
+                                {
+                                    Console.WriteLine("Pogrešan unos.");
+                                }
+                                else
+                                {
+                                    unosPrezimena = false;
+                                }
+
+                            }
                             break;
 
                         case 3:
-                            Console.Write("Unesi datum rođenja (yyyy-MM-dd): ");
-                            zaAzuriranje.DatumRodjenja = DateTime.Parse(Console.ReadLine());
-                            break;
 
+                            DateTime datumRodjenja;
+
+                            while (true)
+                            {
+                                Console.Write("Datum rođenja (yyyy-MM-dd): ");
+
+                                if (!DateTime.TryParse(Console.ReadLine(), out datumRodjenja))
+                                {
+                                    Console.WriteLine("Neispravan format datuma!");
+                                    continue;
+                                }
+
+                                if (datumRodjenja.Date > DateTime.Today)
+                                {
+                                    Console.WriteLine("Datum rođenja ne može biti u budućnosti!");
+                                    continue;
+                                }
+
+                                zaAzuriranje.DatumRodjenja = datumRodjenja;
+                                break;
+                            }
+                            break;
                         case 4:
-                            Console.Write("Unesi OIB: ");
-                            zaAzuriranje.OIB = Console.ReadLine();
+                            while (true)
+                            {
+                                Console.Write("Izbrisan (true/false): ");
+
+                                if (!bool.TryParse(Console.ReadLine(), out bool izbrisan))
+                                {
+                                    Console.WriteLine("Pogrešan unos! Unesite true ili false.");
+                                    continue;
+                                }
+
+                                zaAzuriranje.izbrisan = izbrisan;
+                                break;
+                            }
                             break;
 
                         case 5:
-                            Console.Write("Izbrisan (true/false): ");
-                            zaAzuriranje.izbrisan = bool.Parse(Console.ReadLine());
-                            break;
-
-                        case 6:
                             goto ponovniOdabirKorisnika;
 
                         default:
@@ -212,63 +358,6 @@ namespace VUV_autoservis
             }
 
         }
-
-
-
-
-
-
-
-
-
-
-
-        /* Klijent zaAzuriranje = null;
-
-         foreach (Klijent k in lKlijenta)
-         {
-             if (k.izbrisan == false)
-             {
-                 tableDataKlijent.Add(new List<object>() { k.IDKlijenta, k.Ime, k.Prezime, k.OIB, k.izbrisan });
-             }
-
-         }
-
-         ConsoleTableBuilder
-             .From(tableDataKlijent)
-             .WithTitle("Klijenti")
-             .WithColumn("ID", "Ime", "Prezime", "OIB", "Izbrisan")
-             .ExportAndWriteLine();
-
-     ponovniUnosID:
-         Console.WriteLine("Unesi ID klijenta kojeg želiš izbrisati. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
-         string odabir = Console.ReadLine();
-         if (odabir.ToLower() == "povratak")
-         {
-             return lKlijenta;
-         }
-         int pronadjen = 0;
-         foreach (Klijent k in lKlijenta)
-         {
-             if (k.IDKlijenta == odabir)
-             {
-                 zaAzuriranje = k;
-                 tableDataKlijentZaAzuriranje.Add(new List<object>() { k.IDKlijenta, k.Ime, k.Prezime, k.OIB, k.izbrisan });
-                 pronadjen++;
-             }
-             else if(pronadjen == 0)
-             {
-                 Console.WriteLine("Korisnik sa traženim ID-em nije pronađen.");
-                 goto ponovniUnosID;
-             }*/
-         
-         
-
-        
-
-
-
-
 
         //Brisanje Klijenta
 
@@ -335,11 +424,42 @@ namespace VUV_autoservis
 
             string id = Convert.ToString("V" + (lVozila.Count + 1));
 
-            Console.Write("Registracija: ");
-            string registracija = Console.ReadLine();
+            string registracija = null;
+            bool unosReg = true;
+            while (unosReg)
+            {
+                Console.Write("Registracija: ");
+                registracija = Console.ReadLine();
 
-            Console.Write("Marka: ");
-            string Marka = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(registracija))
+                {
+                    Console.WriteLine("Pogrešan unos.");
+                }
+                else
+                {
+                    unosReg = false;
+                }
+
+            }
+
+
+            bool unosMarka = true;
+            string Marka = null;
+            while (unosMarka)
+            {
+                Console.Write("Marka: ");
+                Marka = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(Marka))
+                {
+                    Console.WriteLine("Pogrešan unos.");
+                }
+                else
+                {
+                    unosMarka = false;
+                }
+
+            }
 
 
             var tableDataVozila = new List<List<object>>();
@@ -360,7 +480,7 @@ namespace VUV_autoservis
 
 
         ponovniUnosID:
-            Console.WriteLine("Unesi ID klijenta kojeg želiš izbrisati.");
+            Console.WriteLine("Unesi ID klijenta koji je vlasnik vozila.");
             string odabir = Console.ReadLine();
 
 
@@ -391,10 +511,154 @@ namespace VUV_autoservis
 
         //AzuriranjeVozila
 
-        public static void azuriranVozila(List<Vozilo> lVozila)
+        public static List<Vozilo> azuriranVozila(List<Vozilo> lVozila)
         {
+        ponovniOdabirKorisnika:
             Console.Clear();
-            var tableDataKlijent = new List<List<object>>();
+            var tableDataVozilo = new List<List<object>>();
+            var tableDataVoziloZaAzuriranje = new List<List<object>>();
+
+            Vozilo zaAzuriranje = null;
+
+            foreach (Vozilo k in lVozila)
+            {
+                if (k.Izbrisan == false)
+                {
+                    tableDataVozilo.Add(new List<object>() { k.IDVozila, k.IDKlijenta, k.RegistracijskaOznaka, k.Marka, k.Izbrisan });
+                }
+
+            }
+
+            ConsoleTableBuilder
+                .From(tableDataVozilo)
+                .WithTitle("Vozila")
+                .WithColumn("ID Vozila", "ID Klijenta", "Registracijska oznaka", "Marka", "Izbrisan")
+                .ExportAndWriteLine();
+
+        ponovniUnosID:
+            Console.WriteLine("Unesi ID vozila kojeg želiš ažurirati. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
+            string odabir = Console.ReadLine();
+            if (odabir.ToLower() == "povratak")
+            {
+                return lVozila;
+            }
+
+
+            int brojObrisanih = 0;
+            foreach (Vozilo k in lVozila)
+            {
+                if (k.IDVozila == odabir)
+                {
+                    zaAzuriranje = k;
+                    tableDataVoziloZaAzuriranje.Add(new List<object>() { k.IDVozila, k.IDKlijenta, k.RegistracijskaOznaka, k.Marka, k.Izbrisan });
+                    brojObrisanih++;
+                }
+            }
+            if (brojObrisanih != 0)
+            {
+                Console.Clear();
+
+                ConsoleTableBuilder
+        .From(tableDataVoziloZaAzuriranje)
+        .WithTitle("Odabrano vozilo")
+        .WithColumn("ID Vozila", "ID Klijenta", "Registracijska oznaka", "Marka", "Izbrisan")
+        .ExportAndWriteLine();
+
+
+                bool izbornikZaAzuriranjeKorisnika = true;
+                while (izbornikZaAzuriranjeKorisnika)
+                {
+                    Console.WriteLine("Odaberi koji dio vozila želiš ažurirati.");
+                    Console.WriteLine("--- 1. Registracijska oznaka");
+                    Console.WriteLine("--- 2. Marka");
+                    Console.WriteLine("--- 3. Izbrisan");
+                    Console.WriteLine("--- 4. Povratak");
+                    odabir = Console.ReadLine();
+                    int odabirProvjereno = 0;
+                    if (!int.TryParse(odabir, out odabirProvjereno))
+                    {
+                        Console.WriteLine("Unos mora biti broj");
+                        odabirProvjereno = 0;
+                    }
+                    switch (odabirProvjereno)
+                    {
+                        case 1:
+                            bool unosReg = true;
+                            while (unosReg)
+                            {
+                                Console.Write("Registracija: ");
+                                zaAzuriranje.RegistracijskaOznaka = Console.ReadLine();
+
+                                if (string.IsNullOrWhiteSpace(zaAzuriranje.RegistracijskaOznaka))
+                                {
+                                    Console.WriteLine("Pogrešan unos.");
+                                }
+                                else
+                                {
+                                    unosReg = false;
+                                }
+
+                            }
+                            break;
+
+                        case 2:
+                            bool unosMarka = true;
+                            while (unosMarka)
+                            {
+                                Console.Write("Marka: ");
+                                zaAzuriranje.Marka = Console.ReadLine();
+
+                                if (string.IsNullOrWhiteSpace(zaAzuriranje.Marka))
+                                {
+                                    Console.WriteLine("Pogrešan unos.");
+                                }
+                                else
+                                {
+                                    unosMarka = false;
+                                }
+
+                            }
+                            break;
+                        case 3:
+                            while (true)
+                            {
+                                Console.Write("Izbrisan (true/false): ");
+
+                                if (!bool.TryParse(Console.ReadLine(), out bool izbrisan))
+                                {
+                                    Console.WriteLine("Pogrešan unos! Unesite true ili false.");
+                                    continue;
+                                }
+
+                                zaAzuriranje.Izbrisan = izbrisan;
+                                break;
+                            }
+                            break;
+                        case 4:
+                            goto ponovniOdabirKorisnika;
+
+                        default:
+                            Console.WriteLine("Nevažeći odabir.");
+                            break;
+                    }
+                }
+
+
+                int index = lVozila.FindIndex(k => k.IDVozila == zaAzuriranje.IDVozila);
+
+                if (index != -1)
+                {
+                    lVozila[index] = zaAzuriranje;
+                }
+
+                return lVozila;
+            }
+            else
+            {
+                Console.WriteLine("Vozilo sa traženim ID-em nije pronađen.");
+                goto ponovniUnosID;
+            }
+
 
         }
 
@@ -430,7 +694,7 @@ namespace VUV_autoservis
             Console.WriteLine("Unesi ID vozila kojeg želiš izbrisati. Ili upiši 'Povratak' za izlazak bez brisanja vozila.");
             string odabir = Console.ReadLine();
 
-            if(odabir.ToLower() == "povratak")
+            if (odabir.ToLower() == "povratak")
             {
                 return lVozila;
             }
@@ -461,7 +725,7 @@ namespace VUV_autoservis
 
         //Dodavanje mehanicar
 
-        public static List<Mehanicar> dodavanjeMehanicar(List<Mehanicar> lMehanicar)
+        public static List<Mehanicar> dodavanjeMehanicar(List<Mehanicar> lMehanicar, List<Klijent> lKlijenata)
         {
             Console.Clear();
             Console.WriteLine("===== UNOS NOVOG Mehanicara =====\n");
@@ -469,32 +733,116 @@ namespace VUV_autoservis
             string id = Convert.ToString("M" + (lMehanicar.Count + 1));
             bool izbris = false;
 
-            Console.Write("Ime: ");
-            string ime = Console.ReadLine();
+            string prezime = null;
+            string ime = null;
 
-            Console.Write("Prezime: ");
-            string prezime = Console.ReadLine();
+
+            bool unosImena = true;
+            while (unosImena)
+            {
+                Console.Write("Ime: ");
+                ime = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(ime))
+                {
+                    Console.WriteLine("Pogrešan unos.");
+
+                }
+                else
+                {
+                    unosImena = false;
+                }
+            }
+
+            bool unosPrezimena = true;
+            while (unosPrezimena)
+            {
+                Console.Write("Prezime: ");
+                prezime = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(prezime))
+                {
+                    Console.WriteLine("Pogrešan unos.");
+                }
+                else
+                {
+                    unosPrezimena = false;
+                }
+
+            }
+
 
             DateTime datumRodjenja;
+
             while (true)
             {
                 Console.Write("Datum rođenja (yyyy-MM-dd): ");
-                if (DateTime.TryParse(Console.ReadLine(), out datumRodjenja))
-                    break;
 
-                Console.WriteLine("Neispravan format datuma!");
+                if (!DateTime.TryParse(Console.ReadLine(), out datumRodjenja))
+                {
+                    Console.WriteLine("Neispravan format datuma!");
+                    continue;
+                }
+
+                if (datumRodjenja.Date > DateTime.Today)
+                {
+                    Console.WriteLine("Datum rođenja ne može biti u budućnosti!");
+                    continue;
+                }
+
+                break;
             }
 
             string oib;
+
             while (true)
             {
                 Console.Write("OIB: ");
                 oib = Console.ReadLine();
 
-                if (oib.Length == 11)
-                    break;
+                long provjereniOIB;
 
-                Console.WriteLine("OIB mora imati 11 znamenki!");
+                if (!long.TryParse(oib, out provjereniOIB))
+                {
+                    Console.WriteLine("OIB mora sadržavati samo brojeve.");
+                    continue;
+                }
+
+                if (oib.Length != 11)
+                {
+                    Console.WriteLine("OIB mora imati točno 11 znamenki.");
+                    continue;
+                }
+
+                bool postoji = false;
+
+                foreach (Klijent k in lKlijenata)
+                {
+                    if (k.OIB == oib)
+                    {
+                        postoji = true;
+                        break;
+                    }
+                }
+
+                if (!postoji)
+                {
+                    foreach (Mehanicar m in lMehanicar)
+                    {
+                        if (m.OIB == oib)
+                        {
+                            postoji = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (postoji)
+                {
+                    Console.WriteLine("Osoba s tim OIB-om već postoji.");
+                    continue;
+                }
+
+                break;
             }
 
             Mehanicar novi = new Mehanicar(
@@ -520,10 +868,181 @@ namespace VUV_autoservis
         //Azuriranje mehanicara
 
 
-        public static void azuriranjeMehanicara(List<Mehanicar> lMehanicara)
+        public static List<Mehanicar> azuriranjeMehanicara(List<Mehanicar> lMehanicara)
         {
+        ponovniOdabirKorisnika:
             Console.Clear();
-            var tableDataKlijent = new List<List<object>>();
+            var tableDataMehanicar = new List<List<object>>();
+            var tableDataMehanicarZaAzuriranje = new List<List<object>>();
+
+            Mehanicar zaAzuriranje = null;
+
+            foreach (Mehanicar k in lMehanicara)
+            {
+                if (k.Izbrisan == false)
+                {
+                    tableDataMehanicar.Add(new List<object>() { k.IDMehanicar, k.Ime, k.Prezime, k.OIB, k.Izbrisan });
+                }
+
+            }
+
+            ConsoleTableBuilder
+                .From(tableDataMehanicar)
+                .WithTitle("Vozila")
+                .WithColumn("ID Mehanicara", "Ime", "Prezime", "OIB", "Izbrisan")
+                .ExportAndWriteLine();
+
+        ponovniUnosID:
+            Console.WriteLine("Unesi ID mehaničara kojeg želiš izbrisati. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
+            string odabir = Console.ReadLine();
+            if (odabir.ToLower() == "povratak")
+            {
+                return lMehanicara;
+            }
+
+
+            int brojObrisanih = 0;
+            foreach (Mehanicar k in lMehanicara)
+            {
+                if (k.IDMehanicar == odabir)
+                {
+                    zaAzuriranje = k;
+                    tableDataMehanicarZaAzuriranje.Add(new List<object>() { k.IDMehanicar, k.Ime, k.Prezime, k.OIB, k.Izbrisan });
+                    brojObrisanih++;
+                }
+            }
+            if (brojObrisanih != 0)
+            {
+                Console.Clear();
+
+                ConsoleTableBuilder
+        .From(tableDataMehanicarZaAzuriranje)
+        .WithTitle("Odabrani mehaničar")
+        .WithColumn("ID Mehanicara", "Ime", "Prezime", "OIB", "Izbrisan")
+        .ExportAndWriteLine();
+
+
+                bool izbornikZaAzuriranjeKorisnika = true;
+                while (izbornikZaAzuriranjeKorisnika)
+                {
+                    Console.WriteLine("Odaberi koji dio mehaničara želiš ažurirati.");
+                    Console.WriteLine("--- 1. Ime");
+                    Console.WriteLine("--- 2. Prezime");
+                    Console.WriteLine("--- 3. Datum rođenja");
+                    Console.WriteLine("--- 4. Izbrisan");
+                    Console.WriteLine("--- 5. Povratak");
+                    odabir = Console.ReadLine();
+                    int odabirProvjereno = 0;
+                    if (!int.TryParse(odabir, out odabirProvjereno))
+                    {
+                        Console.WriteLine("Unos mora biti broj");
+                        odabirProvjereno = 0;
+                    }
+                    switch (odabirProvjereno)
+                    {
+                        case 1:
+                            bool unosImena = true;
+                            while (unosImena)
+                            {
+                                Console.Write("Ime: ");
+                                zaAzuriranje.Ime = Console.ReadLine();
+                                if (string.IsNullOrWhiteSpace(zaAzuriranje.Ime))
+                                {
+                                    Console.WriteLine("Pogrešan unos.");
+
+                                }
+                                else
+                                {
+                                    unosImena = false;
+                                }
+                            }
+                            break;
+
+                        case 2:
+                            bool unosPrezimena = true;
+
+                            while (unosPrezimena)
+                            {
+                                Console.Write("Prezime: ");
+                                zaAzuriranje.Prezime = Console.ReadLine();
+
+                                if (string.IsNullOrWhiteSpace(zaAzuriranje.Prezime))
+                                {
+                                    Console.WriteLine("Pogrešan unos.");
+                                }
+                                else
+                                {
+                                    unosPrezimena = false;
+                                }
+
+                            }
+                            break;
+
+                        case 3:
+                            DateTime datumRodjenja;
+
+                            while (true)
+                            {
+                                Console.Write("Datum rođenja (yyyy-MM-dd): ");
+
+                                if (!DateTime.TryParse(Console.ReadLine(), out datumRodjenja))
+                                {
+                                    Console.WriteLine("Neispravan format datuma!");
+                                    continue;
+                                }
+
+                                if (datumRodjenja.Date > DateTime.Today)
+                                {
+                                    Console.WriteLine("Datum rođenja ne može biti u budućnosti!");
+                                    continue;
+                                }
+
+                                zaAzuriranje.DatumRodjenja = datumRodjenja;
+                                break;
+                            }
+                            break;
+
+                        case 4:
+                            while (true)
+                            {
+                                Console.Write("Izbrisan (true/false): ");
+
+                                if (!bool.TryParse(Console.ReadLine(), out bool izbrisan))
+                                {
+                                    Console.WriteLine("Pogrešan unos! Unesite true ili false.");
+                                    continue;
+                                }
+
+                                zaAzuriranje.Izbrisan = izbrisan;
+                                break;
+                            }
+                            break;
+
+                        case 5:
+                            goto ponovniOdabirKorisnika;
+
+                        default:
+                            Console.WriteLine("Nevažeći odabir.");
+                            break;
+                    }
+                }
+
+
+                int index = lMehanicara.FindIndex(k => k.IDMehanicar == zaAzuriranje.IDMehanicar);
+
+                if (index != -1)
+                {
+                    lMehanicara[index] = zaAzuriranje;
+                }
+
+                return lMehanicara;
+            }
+            else
+            {
+                Console.WriteLine("Mehaničar sa traženim ID-em nije pronađen.");
+                goto ponovniUnosID;
+            }
+
 
         }
 
@@ -547,7 +1066,7 @@ namespace VUV_autoservis
             ConsoleTableBuilder
                 .From(tableDataMehanicar)
                 .WithTitle("Mehanicar")
-                .WithColumn("IDMehanicara", "Ime", "Prezime","Datum rodjenja", "OIB", "Izbrisan")
+                .WithColumn("IDMehanicara", "Ime", "Prezime", "Datum rodjenja", "OIB", "Izbrisan")
                 .ExportAndWriteLine();
 
         ponovniUnosID:
@@ -570,12 +1089,12 @@ namespace VUV_autoservis
             }
             if (brojObrisanih != 0)
             {
-                Console.WriteLine("Klijent uspješno obirsan.");
+                Console.WriteLine("Mehanicar uspješno obirsan.");
                 return lMehanicara;
             }
             else
             {
-                Console.WriteLine("Korisnik sa traženim ID-em nije pronađen.");
+                Console.WriteLine("Mehanicar sa traženim ID-em nije pronađen.");
                 goto ponovniUnosID;
             }
 
@@ -586,11 +1105,688 @@ namespace VUV_autoservis
 
 
         //Radni nalozi
-        /*public static List<RadniNalog> otvaranjeRadnogNaloga(List<RadniNalog> lRadnihNaloga)
+        public static List<RadniNalog> otvaranjeRadnogNaloga(List<RadniNalog> lRadnihNaloga, List<Klijent> lKlijenta, List<Mehanicar> lMehnaicara, List<Vozilo> lVozila)
         {
+            Console.Clear();
+            Console.WriteLine("--- Unos Novog Naloga ---");
+
+            var tableDataKlijentZaAzuriranje = new List<List<object>>();
+            var aktivnaVozila = new List<Vozilo>();
+
+            foreach (Vozilo v in lVozila)
+            {
+                if (v.Izbrisan == false)
+                {
+                    aktivnaVozila.Add(v);
+                }
+            }
+
+            var aktivniMehanicari = new List<Mehanicar>();
+
+            foreach (Mehanicar meh in lMehnaicara)
+            {
+                if (meh.Izbrisan == false)
+                {
+                    aktivniMehanicari.Add(meh);
+                }
+            }
+
+            var aktivniKlijent = new List<Klijent>();
+
+            foreach (Klijent k in lKlijenta)
+            {
+                if (k.izbrisan == false)
+                {
+                    aktivniKlijent.Add(k);
+                }
+            }
+
+            string noviRadniNalogIDKlijenta = null;
+            string noviRadniNalogIDVozila = null;
+            string noviRadniNalogIDMehanicara = null;
+            int noviRadniNalogCijena = 0;
+            string noviRadniNalogUsluga = null;
+            string noviRadniNalogStatus = null;
+            DateTime Datum = DateTime.Now;
+
+            string id = Convert.ToString("N" + (lRadnihNaloga.Count + 1));
+        ponovniOdabiVozila:
+            int brojObrisanih = 0;
+            string odabir = null;
+
+
+
+            Console.Clear();
+        
+            var tableDataVozilo = new List<List<object>>();
+            var tableDataVoziloZaAzuriranje = new List<List<object>>();
+
+
+            foreach (Vozilo k in aktivnaVozila)
+            {
+                if (k.Izbrisan == false)
+                {
+                    tableDataVozilo.Add(new List<object>() { k.IDVozila, k.IDKlijenta, k.RegistracijskaOznaka, k.Marka, k.Izbrisan });
+                }
+
+            }
+
+            ConsoleTableBuilder.From(tableDataVozilo).WithTitle("Vozila").WithColumn("ID Vozila", "ID Klijenta", "Registracijska oznaka", "Marka", "Izbrisan").ExportAndWriteLine();
+
+            Console.WriteLine("Unesi ID vozila za koje želiš kreirati radni nalog. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
+            odabir = Console.ReadLine();
+            if (odabir.ToLower() == "povratak")
+            {
+                return lRadnihNaloga;
+            }
+            brojObrisanih = 0;
+            foreach (Vozilo k in aktivnaVozila)
+            {
+                if (k.IDVozila == odabir )
+                {
+                    noviRadniNalogIDVozila = k.IDVozila;
+                    noviRadniNalogIDKlijenta = k.IDKlijenta;
+                    tableDataVoziloZaAzuriranje.Add(new List<object>() { k.IDVozila, k.IDKlijenta, k.RegistracijskaOznaka, k.Marka, k.Izbrisan });
+                    brojObrisanih++;
+                }
+            }
+            foreach (Klijent k in aktivniKlijent)
+            {
+                if (k.IDKlijenta == noviRadniNalogIDKlijenta)
+                {
+                    tableDataKlijentZaAzuriranje.Add(new List<object>() { k.IDKlijenta, k.Ime, k.Prezime, k.DatumRodjenja, k.OIB, k.izbrisan });
+                    brojObrisanih++;
+                }
+            }
+            if (brojObrisanih != 0)
+            {
+                ponovniOdabirMehanicar:
+                Console.Clear();
+                
+                ConsoleTableBuilder.From(tableDataKlijentZaAzuriranje).WithTitle("Odabrani Klijent").WithColumn("ID", "Ime", "Prezime", "OIB", "Izbrisan").ExportAndWriteLine();
+                ConsoleTableBuilder.From(tableDataVoziloZaAzuriranje).WithTitle("Odabrano vozilo").WithColumn("ID Vozila", "ID Klijenta", "Registracijska oznaka", "Marka", "Izbrisan").ExportAndWriteLine();
+
+                var tableDataMehanicar = new List<List<object>>();
+                var tableDataMehanicarZaAzuriranje = new List<List<object>>();
+
+
+                foreach (Mehanicar k in lMehnaicara)
+                {
+                    if (k.Izbrisan == false)
+                    {
+                        tableDataMehanicar.Add(new List<object>() { k.IDMehanicar, k.Ime, k.Prezime, k.OIB, k.Izbrisan });
+                    }
+
+                }
+
+                ConsoleTableBuilder
+                    .From(tableDataMehanicar)
+                    .WithTitle("Vozila")
+                    .WithColumn("ID Mehanicara", "Ime", "Prezime", "OIB", "Izbrisan")
+                    .ExportAndWriteLine();
+
+                Console.WriteLine("Unesi ID mehaničara kojem pripada radni nalog. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
+                odabir = Console.ReadLine();
+                if (odabir.ToLower() == "povratak")
+                {
+                    goto ponovniOdabiVozila;
+                }
+
+
+                brojObrisanih = 0;
+                foreach (Mehanicar k in aktivniMehanicari)
+                {
+                    if (k.IDMehanicar == odabir)
+                    {
+                        noviRadniNalogIDMehanicara = k.IDMehanicar;
+                        tableDataMehanicarZaAzuriranje.Add(new List<object>() { k.IDMehanicar, k.Ime, k.Prezime, k.OIB, k.Izbrisan });
+                        brojObrisanih++;
+                    }
+                }
+                if (brojObrisanih != 0)
+                {
+                    Console.Clear();
+                    ConsoleTableBuilder.From(tableDataKlijentZaAzuriranje).WithTitle("Odabrani Klijent").WithColumn("ID", "Ime", "Prezime", "OIB", "Izbrisan").ExportAndWriteLine();
+                    ConsoleTableBuilder.From(tableDataVoziloZaAzuriranje).WithTitle("Odabrano vozilo").WithColumn("ID Vozila", "ID Klijenta", "Registracijska oznaka", "Marka", "Izbrisan").ExportAndWriteLine();
+                    ConsoleTableBuilder.From(tableDataMehanicarZaAzuriranje).WithTitle("Odabrani mehaničar").WithColumn("ID Mehanicara", "Ime", "Prezime", "OIB", "Izbrisan").ExportAndWriteLine();
+
+                    bool izbornikZaOdabirPosla = true;
+
+                    while (izbornikZaOdabirPosla)
+                    {
+                        Console.WriteLine("--- Idabir posla --- ");
+                        Console.WriteLine("1. Dijagnostika");
+                        Console.WriteLine("2. Popravak");
+                        Console.WriteLine("3. Zamjena dijela");
+                        Console.WriteLine("4. Povratak");
+
+                        Console.WriteLine("Unesi svoj odabir. ");
+                        odabir = Console.ReadLine();
+                        int odabirProvjereno = 0;
+                        if (!int.TryParse(odabir, out odabirProvjereno))
+                        {
+                            Console.WriteLine("Unos mora biti broj.");
+                            odabirProvjereno = 0;
+                        }
+                        switch (odabirProvjereno)
+                        {
+                            case 1:
+                                {
+                                    Console.WriteLine("Upiši 'povratak' za povratak na izbor.");
+
+                                    string unos = Console.ReadLine();
+
+                                    if (string.Equals(unos, "povratak", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        goto ponovniOdabirMehanicar;
+                                    }
+
+                                    Dijagnostika dijagnostika = new Dijagnostika("Dijagnostika kvara.");
+                                    noviRadniNalogCijena = dijagnostika.IzracunajCijenu();
+                                    noviRadniNalogUsluga = dijagnostika.Naziv;
+                                    noviRadniNalogStatus = "Zaprimljen";
+                                    izbornikZaOdabirPosla = false;
+                                    break;
+                                }
+                            case 2:
+                                {
+                                    int sati;
+
+                                    while (true)
+                                    {
+                                        Console.WriteLine("Unesi broj radnih sati (ili 'povratak'): ");
+                                        odabir = Console.ReadLine();
+
+                                        if (string.Equals(odabir, "povratak", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            goto ponovniOdabirMehanicar;
+                                        }
+
+                                        if (!int.TryParse(odabir, out sati))
+                                        {
+                                            Console.WriteLine("Unos mora biti broj.");
+                                            continue;
+                                        }
+
+                                        if (sati <= 0)
+                                        {
+                                            Console.WriteLine("Broj sati mora biti veći od 0.");
+                                            continue;
+                                        }
+
+                                        break;
+                                    }
+
+                                    Popravak popravak = new Popravak("Popravak", sati);
+                                    noviRadniNalogCijena = popravak.IzracunajCijenu();
+                                    noviRadniNalogUsluga = popravak.Naziv;
+                                    noviRadniNalogStatus = "Zaprimljen";
+                                    izbornikZaOdabirPosla = false;
+                                    break;
+                                }
+                            case 3:
+                                {
+                                    int cijenaDijela;
+
+                                    while (true)
+                                    {
+                                        Console.WriteLine("Unesi cijenu zamjenskog dijela (ili upiši 'povratak' za povratak):");
+                                        odabir = Console.ReadLine();
+
+                                        if (string.Equals(odabir, "povratak", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            goto ponovniOdabirMehanicar;
+                                        }
+
+                                        if (!int.TryParse(odabir, out cijenaDijela))
+                                        {
+                                            Console.WriteLine("Unos mora biti broj.");
+                                            continue;
+                                        }
+
+                                        if (cijenaDijela < 0)
+                                        {
+                                            Console.WriteLine("Cijena ne može biti negativna.");
+                                            continue;
+                                        }
+
+                                        break;
+                                    }
+
+                                    ZamjenaDijela d = new ZamjenaDijela("Zamjena dijela.", cijenaDijela);
+                                    noviRadniNalogCijena = d.IzracunajCijenu();
+                                    noviRadniNalogUsluga = d.Naziv;
+                                    noviRadniNalogStatus = "Zaprimljen";
+                                    izbornikZaOdabirPosla = false;
+                                    break;
+                                }
+                            case 4:
+                                goto ponovniOdabirMehanicar;
+                            default:
+                                Console.WriteLine("Nevažeći odabir.");
+                                break;
+                        }
+
+                    }
+
+                }
+                else
+                {
+                    Console.WriteLine("Mehanicar sa traženim ID-em nije pronađen.");
+                    goto ponovniOdabirMehanicar;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Vozilo sa traženim ID-em nije pronađen.");
+                goto ponovniOdabiVozila;
+            }   
+
+            RadniNalog noviRadniNalog = new RadniNalog(
+                    id,
+                    noviRadniNalogIDVozila,
+                    noviRadniNalogIDMehanicara,
+                    noviRadniNalogIDKlijenta,
+                    Datum,
+                    noviRadniNalogStatus,
+                    noviRadniNalogCijena,
+                    noviRadniNalogUsluga
+            ); ;
+
+            lRadnihNaloga.Add(noviRadniNalog);
+            return lRadnihNaloga;
 
         }
-        */
+
+
+
+
+    public static List<RadniNalog> promjenaStatusaRadnogNaloga(List<RadniNalog> lRadnihNaloga)
+    {
+    ponovniOdabirRadnogNaloga:
+        Console.Clear();
+
+        Console.WriteLine("--- Azuriranje statusa naloga  ---");
+        var tableDataRadniNalozi = new List<List<object>>();
+        var tableDataRadniNalozitZaAzuriranje = new List<List<object>>();
+
+
+
+        RadniNalog noviRadniNalogIDKlijenta = null;
+
+
+        foreach (RadniNalog k in lRadnihNaloga)
+        {
+            if (k.Status != "Zavrsen") {
+                tableDataRadniNalozi.Add(new List<object>() { k.IDRadniNalog, k.IDVozila, k.IDKlijenta, k.IDMehanicara, k.Datum, k.Status, k.Cijena, k.Usluga });
+            }
+
+        }
+
+
+
+        ConsoleTableBuilder.From(tableDataRadniNalozi).WithTitle("Radni nalozi").WithColumn("ID radnog nalog", "ID vozila", "ID Klijenta", "ID Mehanicara", "Datum", "Status", "Cijena", "Usluga").ExportAndWriteLine();
+
+        Console.WriteLine("Unesi ID naloga za kojeg želiš azurirati status. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
+        string odabir = Console.ReadLine();
+        if (odabir.ToLower() == "povratak")
+        {
+            return lRadnihNaloga;
+        }
+
+
+        int pronadjenihNaloga = 0;
+        foreach (RadniNalog k in lRadnihNaloga)
+        {
+            if (k.IDRadniNalog == odabir)
+            {
+                noviRadniNalogIDKlijenta = k;
+                tableDataRadniNalozitZaAzuriranje.Add(new List<object>() { k.IDRadniNalog, k.IDVozila, k.IDKlijenta, k.IDMehanicara, k.Datum, k.Status, k.Cijena, k.Usluga });
+                pronadjenihNaloga++;
+            }
+        }
+        if (pronadjenihNaloga == 0)
+        {
+            Console.WriteLine("Vozilo sa traženim ID-em nije pronađen.");
+            goto ponovniOdabirRadnogNaloga;
+        }
+
+        ConsoleTableBuilder.From(tableDataRadniNalozitZaAzuriranje).WithTitle("Odabrani radni nalog.").WithColumn("ID radnog nalog", "ID vozila", "ID Klijenta", "ID Mehanicara", "Datum", "Status", "Cijena", "Usluga").ExportAndWriteLine();
+
+
+
+        if (noviRadniNalogIDKlijenta.Status == "Zaprimljen")
+        {
+
+            bool izbornikStatusa = true;
+            while (izbornikStatusa)
+            {
+            ponovniOdabir:
+                Console.Clear();
+                Console.WriteLine("--- Odaberi novi status ---");
+                Console.WriteLine("--- 1. U_Radu ---");
+                Console.WriteLine("--- 2. Povratak ---");
+
+                odabir = Console.ReadLine();
+                int odabirProvjereno = 0;
+                if (!int.TryParse(odabir, out odabirProvjereno))
+                {
+                    Console.WriteLine("Odabir mora biti broj.");
+                    odabirProvjereno = 0;
+                }
+                if (odabirProvjereno == 0)
+                {
+                    goto ponovniOdabir;
+                }
+                switch (odabirProvjereno)
+                {
+                    case 1:
+
+                        noviRadniNalogIDKlijenta.Status = "U_Radu";
+                        izbornikStatusa = false;
+                        break;
+                    case 2:
+                        goto ponovniOdabirRadnogNaloga;
+                    default:
+                        Console.WriteLine("Uneseno nešto što nije opcija.");
+                        break;
+
+                }
+            }
+        }
+        else if (noviRadniNalogIDKlijenta.Status == "U_Radu")
+        {
+
+            bool izbornikStatusa = true;
+            while (izbornikStatusa)
+            {
+            ponovniOdabir:
+                Console.Clear();
+                Console.WriteLine("--- Odaberi novi status ---");
+                Console.WriteLine("--- 1. Zavrsen ---");
+                Console.WriteLine("--- 2. Povratak ---");
+
+                odabir = Console.ReadLine();
+                int odabirProvjereno = 0;
+                if (!int.TryParse(odabir, out odabirProvjereno))
+                {
+                    Console.WriteLine("Odabir smora biti broj.");
+                    odabirProvjereno = 0;
+                }
+                if (odabirProvjereno == 0)
+                {
+                    goto ponovniOdabir;
+                }
+                switch (odabirProvjereno)
+                {
+                    case 1:
+
+                        noviRadniNalogIDKlijenta.Status = "Zavrsen";
+                        izbornikStatusa = false;
+
+                        break;
+                    case 2:
+                        goto ponovniOdabirRadnogNaloga;
+                    default:
+                        Console.WriteLine("Uneseno nešto što nije opcija.");
+                        break;
+
+                }
+            }
+        }
+    
+            
+            int index = lRadnihNaloga.FindIndex(k => k.IDRadniNalog == noviRadniNalogIDKlijenta.IDRadniNalog);
+
+            if (index != -1)
+            {
+                lRadnihNaloga[index] = noviRadniNalogIDKlijenta;
+            }
+
+            return lRadnihNaloga;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //Pregled radnih naloga
+
+
+        public static void pregledNalogaVozila(List<RadniNalog> lRadniNalozi, List<Vozilo> lVozila)
+        {
+            Console.Clear();
+
+
+            var tableDataVozila = new List<List<object>>();
+            var tableDataOdabranoVozilo = new List<List<object>>();
+            var radniNaloziOdabranogVozila = new List<List<object>>();
+
+            Vozilo odabranoVozilo = null;
+
+
+
+            foreach (Vozilo v in lVozila)
+            {
+                if (v.Izbrisan == false)
+                {
+                    tableDataVozila.Add(new List<object>() { v.IDVozila, v.RegistracijskaOznaka, v.Marka, v.IDKlijenta, v.Izbrisan });
+                }
+
+            }
+
+            ConsoleTableBuilder
+                .From(tableDataVozila)
+                .WithTitle("Vozila")
+                .WithColumn("IDVozila", "Registracija", "Marka", "IDKlijenta", "Izbrisan")
+                .ExportAndWriteLine();
+
+        ponovniUnosID:
+            Console.WriteLine("Unesi ID vozila kojeg želiš odabrati. Ili upiši 'Povratak' za izlazak bez brisanja vozila.");
+            string odabir = Console.ReadLine();
+
+            if (odabir.ToLower() == "povratak")
+            {
+
+            }
+            else {
+                int brojObrisanih = 0;
+                foreach (Vozilo v in lVozila)
+                {
+                    if (v.IDVozila == odabir)
+                    {
+                        odabranoVozilo = v;
+                        tableDataOdabranoVozilo.Add(new List<object>() { v.IDVozila, v.RegistracijskaOznaka, v.Marka, v.IDKlijenta, v.Izbrisan });
+                        brojObrisanih++;
+                    }
+                }
+                if (brojObrisanih != 0)
+                {
+                    foreach (RadniNalog n in lRadniNalozi)
+                    {
+                        if (n.IDVozila == odabranoVozilo.IDVozila)
+                        {
+                            radniNaloziOdabranogVozila.Add(new List<object>() { n.IDRadniNalog, n.IDVozila, n.IDKlijenta, n.IDMehanicara, n.Datum, n.Status, n.Cijena, n.Usluga });
+                        }
+
+                    }
+                    Console.Clear();
+                    ConsoleTableBuilder.From(tableDataVozila).WithTitle("Odabrano Vozilo").WithColumn("IDVozila", "Registracija", "Marka", "IDKlijenta", "Izbrisan").ExportAndWriteLine();
+                    ConsoleTableBuilder.From(radniNaloziOdabranogVozila).WithTitle("Radni nalozi").WithColumn("ID radnog nalog", "ID vozila", "ID Klijenta", "ID Mehanicara", "Datum", "Status", "Cijena", "Usluga").ExportAndWriteLine();
+                    Console.WriteLine("Pritisnite ENTER za nastavak.");
+                    Console.ReadLine();
+
+                }
+                else
+                {
+                    Console.WriteLine("Vozilo sa traženim ID-em nije pronađen.");
+                    goto ponovniUnosID;
+                }
+            }
+        }
+
+        public static void statistika(List<Vozilo> lVozila, List<Klijent> lKlijenta, List<RadniNalog> lRadniNalozi, List<Mehanicar> lMehanicara)
+        {
+
+            // PRIHOD PO USLUGAMA
+            var tableDataUsluge = new List<List<object>>();
+            int sumaDia = 0;
+            int sumaPopravak = 0;
+            int sumaZamjenaDijela = 0;
+
+
+
+
+
+            foreach (RadniNalog nalog in lRadniNalozi)
+            {
+                if (nalog.Status == "Zavrsen")
+                {
+                    if(nalog.Usluga == "Dijagnostika")
+                    {
+                        sumaDia += nalog.Cijena;
+                    }else if(nalog.Usluga == "Popravak")
+                    {
+                        sumaPopravak += nalog.Cijena;
+                    }else if(nalog.Usluga == "Dijagnostika kvara.")
+                    {
+                        sumaZamjenaDijela += nalog.Cijena;
+                    }
+                }
+            }
+            tableDataUsluge.Add(new List<object>() { "Dijagnostika", sumaDia });
+            tableDataUsluge.Add(new List<object>() { "Popravak", sumaPopravak });
+            tableDataUsluge.Add(new List<object>() { "Dijagnostika kvara.", sumaZamjenaDijela });
+
+            for (int i = 0; i < tableDataUsluge.Count - 1; i++)
+            {
+                for (int j = 0; j < tableDataUsluge.Count - i - 1; j++)
+                {
+                    int trenutni = Convert.ToInt32(tableDataUsluge[j][1]);
+                    int sljedeci = Convert.ToInt32(tableDataUsluge[j + 1][1]);
+
+                    if (trenutni < sljedeci)
+                    {
+                        var temp = tableDataUsluge[j];
+                        tableDataUsluge[j] = tableDataUsluge[j + 1];
+                        tableDataUsluge[j + 1] = temp;
+                    }
+                }
+            }
+
+            ConsoleTableBuilder
+    .From(tableDataUsluge)
+    .WithTitle("Prihod po vrsti usluge (sortirano)")
+    .WithColumn("Usluga", "Prihod")
+    .ExportAndWriteLine();
+
+
+            // TOP 5 MEHANIČARA
+
+            var tableDataMehanicari = new List<List<object>>();
+
+            foreach (Mehanicar m in lMehanicara)
+            {
+                int brojNaloga = 0;
+
+                foreach (RadniNalog nalog in lRadniNalozi)
+                {
+                    if (nalog.IDMehanicara == m.IDMehanicar)
+                    {
+                        brojNaloga++;
+                    }
+                }
+
+                tableDataMehanicari.Add(new List<object>()
+        {
+            m.IDMehanicar,
+            m.Ime + " " + m.Prezime,
+            brojNaloga
+        });
+            }
+
+            // sortiranje po broju naloga
+            for (int i = 0; i < tableDataMehanicari.Count - 1; i++)
+            {
+                for (int j = i + 1; j < tableDataMehanicari.Count; j++)
+                {
+                    if (Convert.ToInt32(tableDataMehanicari[j][2]) >
+                        Convert.ToInt32(tableDataMehanicari[i][2]))
+                    {
+                        var temp = tableDataMehanicari[i];
+                        tableDataMehanicari[i] = tableDataMehanicari[j];
+                        tableDataMehanicari[j] = temp;
+                    }
+                }
+            }
+
+            var top5Mehanicara = new List<List<object>>();
+
+            for (int i = 0; i < tableDataMehanicari.Count && i < 5; i++)
+            {
+                top5Mehanicara.Add(tableDataMehanicari[i]);
+            }
+
+            ConsoleTableBuilder
+                .From(top5Mehanicara)
+                .WithTitle("Top 5 mehanicara")
+                .WithColumn("ID", "Ime i prezime", "Broj naloga")
+                .ExportAndWriteLine();
+
+
+            // PROSJEČNA CIJENA
+
+            int ukupnaCijena = 0;
+
+            foreach (RadniNalog nalog in lRadniNalozi)
+            {
+                if(nalog.Status == "Zavrsen") {
+                    ukupnaCijena += nalog.Cijena;
+                }
+            }
+
+            double prosjecnaCijena = 0;
+
+            if (lRadniNalozi.Count > 0)
+            {
+                prosjecnaCijena = (double)ukupnaCijena / lRadniNalozi.Count;
+            }
+
+            var tableDataProsjek = new List<List<object>>();
+
+            tableDataProsjek.Add(new List<object>()
+    {
+        Math.Round(prosjecnaCijena, 2)
+    });
+
+            ConsoleTableBuilder
+                .From(tableDataProsjek)
+                .WithColumn("Prosjecna cijena")
+                .ExportAndWriteLine();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -604,11 +1800,15 @@ namespace VUV_autoservis
             vozila = UcitajVozila();
             mehanicari = UcitajMehanicare();
             radniNalozi = UcitajRadniNalog();
-            try
-            {
 
 
-                bool pocetniIzbornik = true;
+            IntPtr handle = GetConsoleWindow();
+            ShowWindow(handle, SW_MAXIMIZE);
+
+
+
+
+            bool pocetniIzbornik = true;
                 while (pocetniIzbornik)
                 {
 
@@ -651,7 +1851,7 @@ namespace VUV_autoservis
                                 switch (odabirProvjereno)
                                 {
                                     case 1:
-                                        klijenti = dodavanjeKlijenata(klijenti);
+                                        klijenti = dodavanjeKlijenata(klijenti, mehanicari);
                                         SpremiKlijente(klijenti);
                                         SpremiVozila(vozila);
                                         SpremiMehanicar(mehanicari);
@@ -712,7 +1912,7 @@ namespace VUV_autoservis
                                         SpremiRadniNalog(radniNalozi);
                                         break;
                                     case 2:
-                                        //vozila = azuriranjeVozila(vozila);
+                                        vozila = azuriranVozila(vozila);
                                         SpremiKlijente(klijenti);
                                         SpremiVozila(vozila);
                                         SpremiMehanicar(mehanicari);
@@ -757,14 +1957,14 @@ namespace VUV_autoservis
                                 switch (odabirProvjereno)
                                 {
                                     case 1:
-                                        mehanicari = dodavanjeMehanicar(mehanicari);
+                                        mehanicari = dodavanjeMehanicar(mehanicari, klijenti);
                                         SpremiKlijente(klijenti);
                                         SpremiVozila(vozila);
                                         SpremiMehanicar(mehanicari);
                                         SpremiRadniNalog(radniNalozi);
                                         break;
                                     case 2:
-                                        //mehanicar = azuriranjeMehanicar(mehanicar);
+                                        mehanicari = azuriranjeMehanicara(mehanicari);
                                         SpremiKlijente(klijenti);
                                         SpremiVozila(vozila);
                                         SpremiMehanicar(mehanicari);
@@ -809,21 +2009,21 @@ namespace VUV_autoservis
                                 switch (odabirProvjereno)
                                 {
                                     case 1:
-                                        //otvaranjeRadnogNaloga();
+                                        radniNalozi = otvaranjeRadnogNaloga(radniNalozi, klijenti, mehanicari, vozila);
                                         SpremiKlijente(klijenti);
                                         SpremiVozila(vozila);
                                         SpremiMehanicar(mehanicari);
                                         SpremiRadniNalog(radniNalozi);
                                         break;
                                     case 2:
-                                        //promjenaStatusaRadnogNaloga();
+                                        radniNalozi = promjenaStatusaRadnogNaloga(radniNalozi);
                                         SpremiKlijente(klijenti);
                                         SpremiVozila(vozila);
                                         SpremiMehanicar(mehanicari);
                                         SpremiRadniNalog(radniNalozi);
                                         break;
                                     case 3:
-                                        //pregledNalogaVozila();
+                                        pregledNalogaVozila(radniNalozi, vozila);
                                         SpremiKlijente(klijenti);
                                         SpremiVozila(vozila);
                                         SpremiMehanicar(mehanicari);
@@ -845,32 +2045,12 @@ namespace VUV_autoservis
                             {
                                 Console.Clear();
                                 Console.WriteLine("--- Statistika ---");
-                                Console.WriteLine("--- 4. Povratak ---");
 
+                            statistika(vozila, klijenti, radniNalozi, mehanicari);
 
-                                odabir = Console.ReadLine();
-                                odabirProvjereno = 0;
-                                if (!int.TryParse(odabir, out odabirProvjereno))
-                                {
-                                    Console.WriteLine("Odabir smora biti broj.");
-                                    odabirProvjereno = 0;
-                                }
-                                switch (odabirProvjereno)
-                                {
-                                    case 1:
-                                        break;
-                                    case 2:
-                                        break;
-                                    case 3:
-                                        break;
-                                    case 4:
-                                        izbornikStatistika = false;
-                                        break;
-                                    default:
-                                        Console.WriteLine("Uneseno nešto što nije opcija.");
-                                        break;
-
-                                }
+                            Console.WriteLine("Pritisni ENTER za povratak na izbornik.");
+                            Console.ReadLine();
+                            izbornikStatistika = false;
                             }
 
 
@@ -884,11 +2064,7 @@ namespace VUV_autoservis
 
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            
             SpremiKlijente(klijenti);
             SpremiVozila(vozila);
             SpremiMehanicar(mehanicari);
@@ -992,6 +2168,7 @@ namespace VUV_autoservis
                 string id = node["IDNaloga"]?.InnerText;
                 string vozilo = node["IDVozila"]?.InnerText;
                 string mehanicar = node["IDMehanicara"]?.InnerText;
+                string klijent = node["IDKlijenta"]?.InnerText;
                 string datumStr = node["Datum"]?.InnerText;
                 string status = node["Status"]?.InnerText;
                 string cijenaStr = node["UkupnaCijena"]?.InnerText;
@@ -1000,13 +2177,14 @@ namespace VUV_autoservis
                 if (id == null || vozilo == null || mehanicar == null ||
                     datumStr == null || status == null || cijenaStr == null)
                 {
-                    continue; // preskoči neispravan zapis
+                    continue;
                 }
 
                 RadniNalog k = new RadniNalog(
                     id,
                     vozilo,
                     mehanicar,
+                    klijent,
                     DateTime.Parse(datumStr),
                     status,
                     int.Parse(cijenaStr),
@@ -1111,7 +2289,7 @@ namespace VUV_autoservis
 
             foreach (Mehanicar m in lista)
             {
-                XmlElement Mehanicar = doc.CreateElement("Klijent");
+                XmlElement Mehanicar = doc.CreateElement("Mehanicar");
 
                 XmlElement id = doc.CreateElement("IDMehanicar");
                 id.InnerText = m.IDMehanicar;
@@ -1149,7 +2327,7 @@ namespace VUV_autoservis
         {
             XmlDocument doc = new XmlDocument();
 
-            XmlElement root = doc.CreateElement("RadniNalog");
+            XmlElement root = doc.CreateElement("RadniNalozi");
             doc.AppendChild(root);
 
             foreach (RadniNalog k in lista)
@@ -1164,6 +2342,9 @@ namespace VUV_autoservis
 
                 XmlElement IDMehanicara = doc.CreateElement("IDMehanicara");
                 IDMehanicara.InnerText = k.IDMehanicara;
+
+                XmlElement IDKlijenta = doc.CreateElement("IDKlijenta");
+                IDKlijenta.InnerText = k.IDKlijenta;
 
                 XmlElement Datum = doc.CreateElement("Datum");
                 Datum.InnerText = k.Datum.ToString("yyyy-MM-dd");
@@ -1181,6 +2362,7 @@ namespace VUV_autoservis
                 radniNalog.AppendChild(IDNaloga);
                 radniNalog.AppendChild(IDVozila);
                 radniNalog.AppendChild(IDMehanicara);
+                radniNalog.AppendChild(IDKlijenta);
                 radniNalog.AppendChild(Datum);
                 radniNalog.AppendChild(Status);
                 radniNalog.AppendChild(UkupnaCijena);

@@ -23,4 +23,20 @@
     <OIB>21414124124</OIB>
     <Izbrisan>True</Izbrisan>
   </Klijent>
+  <Klijent>
+    <ID>K4</ID>
+    <Ime>Luka</Ime>
+    <Prezime>borisa</Prezime>
+    <DatumRodjenja>1231-12-12</DatumRodjenja>
+    <OIB>23121231231</OIB>
+    <Izbrisan>False</Izbrisan>
+  </Klijent>
+  <Klijent>
+    <ID>K5</ID>
+    <Ime>Nada</Ime>
+    <Prezime>Kljucar</Prezime>
+    <DatumRodjenja>2000-05-20</DatumRodjenja>
+    <OIB>12313123123</OIB>
+    <Izbrisan>False</Izbrisan>
+  </Klijent>
 </Klijenti>

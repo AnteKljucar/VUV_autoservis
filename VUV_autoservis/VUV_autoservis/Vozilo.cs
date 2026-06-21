@@ -9,8 +9,8 @@ namespace VUV_autoservis
     class Vozilo
     {
         public string IDVozila { get; private set;}
-        public string RegistracijskaOznaka { get; private set; }
-        public string Marka { get; private set; }
+        public string RegistracijskaOznaka { get;  set; }
+        public string Marka { get;  set; }
         public string IDKlijenta { get; private set; }
 
         public bool Izbrisan { get;  set; }

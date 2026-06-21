@@ -11,8 +11,8 @@ namespace VUV_autoservis
         private int cijenaDijela;
         private const int cijenaUsluge = 15;
 
-        public ZamjenaDijela(string id, string naziv, int cijenaDijela)
-            : base(id, naziv)
+        public ZamjenaDijela( string naziv, int cijenaDijela)
+            : base(naziv)
         {
             this.cijenaDijela = cijenaDijela;
         }
@@ -22,11 +22,5 @@ namespace VUV_autoservis
             return cijenaDijela + cijenaUsluge;
         }
 
-        public void Ispis()
-        {
-            Console.WriteLine("ID: " + IDUsluga);
-            Console.WriteLine("Naziv: " + Naziv);
-            Console.WriteLine("Cijena zamjene: " + IzracunajCijenu() + " €");
-        }
     }
 }
