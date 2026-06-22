@@ -207,7 +207,7 @@ namespace VUV_autoservis
                 .ExportAndWriteLine();
 
         ponovniUnosID:
-            Console.WriteLine("Unesi ID klijenta kojeg želiš izbrisati. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
+            Console.WriteLine("Unesi ID klijenta kojeg želiš ažurirati. Upiši 'Povratak' za povratak na izbornik bez brisanje klijenta.");
             string odabir = Console.ReadLine();
             if (odabir.ToLower() == "povratak")
             {
@@ -221,7 +221,7 @@ namespace VUV_autoservis
                 if (k.IDKlijenta == odabir)
                 {
                     zaAzuriranje = k;
-                    tableDataKlijentZaAzuriranje.Add(new List<object>() { k.IDKlijenta, k.Ime, k.Prezime, k.OIB, k.izbrisan });
+                    tableDataKlijentZaAzuriranje.Add(new List<object>() { k.IDKlijenta, k.Ime, k.Prezime, k.DatumRodjenja, k.OIB, k.izbrisan });
                     brojObrisanih++;
                 }
             }
@@ -232,7 +232,7 @@ namespace VUV_autoservis
                 ConsoleTableBuilder
         .From(tableDataKlijentZaAzuriranje)
         .WithTitle("Odabrani Klijent")
-        .WithColumn("ID", "Ime", "Prezime", "OIB", "Izbrisan")
+        .WithColumn("ID", "Ime", "Prezime","Datum rođenja" , "OIB", "Izbrisan")
         .ExportAndWriteLine();
 
 
@@ -365,7 +365,18 @@ namespace VUV_autoservis
         {
             Console.Clear();
             var tableDataKlijent = new List<List<object>>();
+            var aktivniKlijent = new List<Klijent>();
+
             foreach (Klijent k in lKlijenta)
+            {
+                if (k.izbrisan == false)
+                {
+                    aktivniKlijent.Add(k);
+                }
+            }
+            
+
+            foreach (Klijent k in aktivniKlijent)
             {
                 if (k.izbrisan == false)
                 {
@@ -390,7 +401,7 @@ namespace VUV_autoservis
 
 
             int brojObrisanih = 0;
-            foreach (Klijent k in lKlijenta)
+            foreach (Klijent k in aktivniKlijent)
             {
                 if (k.IDKlijenta == odabir)
                 {
@@ -460,10 +471,19 @@ namespace VUV_autoservis
                 }
 
             }
+            var aktivniKlijent = new List<Klijent>();
+
+            foreach (Klijent k in lKlijenta)
+            {
+                if (k.izbrisan == false)
+                {
+                    aktivniKlijent.Add(k);
+                }
+            }
 
 
             var tableDataVozila = new List<List<object>>();
-            foreach (Klijent k in lKlijenta)
+            foreach (Klijent k in aktivniKlijent)
             {
                 if (k.izbrisan == false)
                 {
@@ -485,7 +505,7 @@ namespace VUV_autoservis
 
 
             int brojObrisanih = 0;
-            foreach (Klijent k in lKlijenta)
+            foreach (Klijent k in aktivniKlijent)
             {
                 if (k.IDKlijenta == odabir)
                 {
@@ -673,9 +693,18 @@ namespace VUV_autoservis
         {
             Console.Clear();
 
+            var aktivnaVozila = new List<Vozilo>();
+            foreach (Vozilo v in lVozila)
+            {
+                if (v.Izbrisan == false)
+                {
+                aktivnaVozila.Add(v);                                     
+                }
+            }
+
 
             var tableDataVozila = new List<List<object>>();
-            foreach (Vozilo v in lVozila)
+            foreach (Vozilo v in aktivnaVozila)
             {
                 if (v.Izbrisan == false)
                 {
@@ -700,7 +729,7 @@ namespace VUV_autoservis
             }
 
             int brojObrisanih = 0;
-            foreach (Vozilo v in lVozila)
+            foreach (Vozilo v in aktivnaVozila)
             {
                 if (v.IDVozila == odabir)
                 {
@@ -1055,7 +1084,17 @@ namespace VUV_autoservis
         {
             Console.Clear();
             var tableDataMehanicar = new List<List<object>>();
-            foreach (Mehanicar m in lMehanicara)
+
+            var aktivniMehanicari = new List<Mehanicar>();
+
+            foreach (Mehanicar meh in lMehanicara)
+            {
+                if (meh.Izbrisan == false)
+                {
+                    aktivniMehanicari.Add(meh);
+                }
+            }
+            foreach (Mehanicar m in aktivniMehanicari)
             {
                 if (m.Izbrisan == false)
                 {
@@ -1079,7 +1118,7 @@ namespace VUV_autoservis
 
 
             int brojObrisanih = 0;
-            foreach (Mehanicar m in lMehanicara)
+            foreach (Mehanicar m in aktivniMehanicari)
             {
                 if (m.IDMehanicar == odabir)
                 {
@@ -1110,14 +1149,18 @@ namespace VUV_autoservis
             Console.Clear();
             Console.WriteLine("--- Unos Novog Naloga ---");
 
-            var tableDataKlijentZaAzuriranje = new List<List<object>>();
-            var aktivnaVozila = new List<Vozilo>();
 
+            var aktivnaVozila = new List<Vozilo>();
             foreach (Vozilo v in lVozila)
             {
                 if (v.Izbrisan == false)
                 {
-                    aktivnaVozila.Add(v);
+                    foreach(Klijent k in lKlijenta)
+                    {
+                        if(v.IDKlijenta == k.IDKlijenta && k.izbrisan == false) {
+                            aktivnaVozila.Add(v);
+                        }
+                    }
                 }
             }
 
@@ -1141,6 +1184,15 @@ namespace VUV_autoservis
                 }
             }
 
+
+
+            string id = Convert.ToString("N" + (lRadnihNaloga.Count + 1));
+        ponovniOdabiVozila:
+
+            var tableDataKlijentZaAzuriranje = new List<List<object>>();
+
+            int brojObrisanih = 0;
+            string odabir = null;
             string noviRadniNalogIDKlijenta = null;
             string noviRadniNalogIDVozila = null;
             string noviRadniNalogIDMehanicara = null;
@@ -1148,12 +1200,6 @@ namespace VUV_autoservis
             string noviRadniNalogUsluga = null;
             string noviRadniNalogStatus = null;
             DateTime Datum = DateTime.Now;
-
-            string id = Convert.ToString("N" + (lRadnihNaloga.Count + 1));
-        ponovniOdabiVozila:
-            int brojObrisanih = 0;
-            string odabir = null;
-
 
 
             Console.Clear();
@@ -1203,7 +1249,7 @@ namespace VUV_autoservis
                 ponovniOdabirMehanicar:
                 Console.Clear();
                 
-                ConsoleTableBuilder.From(tableDataKlijentZaAzuriranje).WithTitle("Odabrani Klijent").WithColumn("ID", "Ime", "Prezime", "OIB", "Izbrisan").ExportAndWriteLine();
+                ConsoleTableBuilder.From(tableDataKlijentZaAzuriranje).WithTitle("Odabrani Klijent").WithColumn("ID", "Ime", "Prezime","Datum rođenja", "OIB", "Izbrisan").ExportAndWriteLine();
                 ConsoleTableBuilder.From(tableDataVoziloZaAzuriranje).WithTitle("Odabrano vozilo").WithColumn("ID Vozila", "ID Klijenta", "Registracijska oznaka", "Marka", "Izbrisan").ExportAndWriteLine();
 
                 var tableDataMehanicar = new List<List<object>>();
