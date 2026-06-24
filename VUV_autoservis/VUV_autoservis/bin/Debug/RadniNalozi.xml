@@ -86,7 +86,7 @@
     <IDMehanicara>M3</IDMehanicara>
     <IDKlijenta>K4</IDKlijenta>
     <Datum>2026-06-22</Datum>
-    <Status>Zaprimljen</Status>
+    <Status>Zavrsen</Status>
     <UkupnaCijena>60</UkupnaCijena>
     <Usluga>Popravak</Usluga>
   </RadniNalog>
@@ -109,5 +109,15 @@
     <Status>Zaprimljen</Status>
     <UkupnaCijena>40</UkupnaCijena>
     <Usluga>Zamjena dijela.</Usluga>
+  </RadniNalog>
+  <RadniNalog>
+    <IDNaloga>N12</IDNaloga>
+    <IDVozila>V2</IDVozila>
+    <IDMehanicara>M3</IDMehanicara>
+    <IDKlijenta>K4</IDKlijenta>
+    <Datum>2026-06-23</Datum>
+    <Status>Zaprimljen</Status>
+    <UkupnaCijena>50</UkupnaCijena>
+    <Usluga>Dijagnostika kvara.</Usluga>
   </RadniNalog>
 </RadniNalozi>

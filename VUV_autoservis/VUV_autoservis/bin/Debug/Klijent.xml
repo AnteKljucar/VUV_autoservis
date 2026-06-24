@@ -39,4 +39,12 @@
     <OIB>12313123123</OIB>
     <Izbrisan>False</Izbrisan>
   </Klijent>
+  <Klijent>
+    <ID>K6</ID>
+    <Ime>1231</Ime>
+    <Prezime>a</Prezime>
+    <DatumRodjenja>2026-05-12</DatumRodjenja>
+    <OIB>12345678911</OIB>
+    <Izbrisan>True</Izbrisan>
+  </Klijent>
 </Klijenti>
